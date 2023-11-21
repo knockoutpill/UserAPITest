@@ -2,10 +2,22 @@ using UserAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using UserAPI.Services;
 using System.Reflection;
-using System.IO;
+using Serilog;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using System;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("logs/myapp-.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddDbContext<UserDbContext>(options =>
