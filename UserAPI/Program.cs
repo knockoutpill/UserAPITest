@@ -1,6 +1,9 @@
 using UserAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using UserAPI.Services;
+using System.Reflection;
+using System.IO;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,9 +15,16 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, MockEmailService>();
 builder.Services.AddScoped<ISmsService, MockSmsService>();
 
-// Configure Swagger/OpenAPI
+// Configure Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "User Test API", Version = "v1" });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
 
